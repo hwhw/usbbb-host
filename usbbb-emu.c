@@ -272,11 +272,31 @@ static int bb_event_thread(void *d) {
 
       for(int i=0; i<SENSOR_ROWS; i++) {
         int s = C->measure_row * SENSOR_ROWS + i;
-        if(C->sensorstate[s] & S_RGB_MASK) {
-          // TODO: set sensor state according to LED and chip color
+        int r = 0;
+        int g = 0;
+        int b = 0;
+        if(s<64) {
+          int x = s / 8;
+          int y = 7-(s % 8);
+          for(int i=0; i<4; i++) {
+            int led = C->pos_leds10[y+1][x+1][i];
+            if(led == -1) break;
+            r = r + C->xmit_fb[led*3];
+            g = g + C->xmit_fb[1+led*3];
+            b = b + C->xmit_fb[2+led*3];
+          }
         } else {
-          int level = 100; // TODO: make this dependent on LED color (leakage)
-          C->sensors[s] = level+(random()%120);
+          r = 1024;
+          g = 1024;
+          b = 1024;
+        }
+        int randnoise = random() % 100;
+        r = r * ((S_RGB_RED(C->sensorstate[s]) > 200) ? 3 : 0) + (random() % 200) + 100;
+        g = g * ((S_RGB_GREEN(C->sensorstate[s]) > 200) ? 3 : 0) + (random() % 200) + 100;
+        b = b * ((S_RGB_BLUE(C->sensorstate[s]) > 200) ? 3 : 0) + (random() % 200) + 100;
+        C->sensors[s] = (((r>g)?r:g)>b)?((r>g)?r:g):b;
+        if(0 == (C->sensorstate[s] & S_RGB_MASK)) {
+          C->sensors[s] = C->sensors[s]/100+(random()%120);
         }
       }
 
