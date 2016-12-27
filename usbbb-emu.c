@@ -185,10 +185,11 @@ static void render(bb_ctx *C) {
     int offs = i % 20;
     if(offs < 2 || offs > 17) {
       /* side fields are a bit darker */
-      SDL_SetRenderDrawColor(C->renderer, *c++, *c++, *c++, 200);
+      SDL_SetRenderDrawColor(C->renderer, c[0], c[1], c[2], 200);
     } else {
-      SDL_SetRenderDrawColor(C->renderer, *c++, *c++, *c++, (i<160) ? 255 : 128);
+      SDL_SetRenderDrawColor(C->renderer, c[0], c[1], c[2], (i<160) ? 255 : 128);
     }
+    c += 3;
     SDL_RenderFillRect(C->renderer, rect_led(i, &r));
   }
   /* paint sensor markers */
