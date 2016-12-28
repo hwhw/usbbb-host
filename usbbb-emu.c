@@ -185,9 +185,9 @@ static void render(bb_ctx *C) {
     int offs = i % 20;
     if(offs < 2 || offs > 17) {
       /* side fields are a bit darker */
-      SDL_SetRenderDrawColor(C->renderer, c[0], c[1], c[2], 200);
+      SDL_SetRenderDrawColor(C->renderer, c[1], c[0], c[2], 200);
     } else {
-      SDL_SetRenderDrawColor(C->renderer, c[0], c[1], c[2], (i<160) ? 255 : 128);
+      SDL_SetRenderDrawColor(C->renderer, c[1], c[0], c[2], (i<160) ? 255 : 128);
     }
     c += 3;
     SDL_RenderFillRect(C->renderer, rect_led(i, &r));
@@ -266,8 +266,8 @@ static int bb_event_thread(void *d) {
       SDL_LockMutex(C->mutex_transmitting);
       if(C->xmit) {
         C->xmit = false;
-        render(C);
       }
+      render(C);
       
       SDL_LockMutex(C->mutex_wait_sensor);
 
@@ -282,19 +282,19 @@ static int bb_event_thread(void *d) {
           for(int i=0; i<4; i++) {
             int led = C->pos_leds10[y+1][x+1][i];
             if(led == -1) break;
-            r = r + C->xmit_fb[led*3];
-            g = g + C->xmit_fb[1+led*3];
+            r = r + C->xmit_fb[1+led*3];
+            g = g + C->xmit_fb[led*3];
             b = b + C->xmit_fb[2+led*3];
           }
         } else {
-          r = 1024;
-          g = 1024;
-          b = 1024;
+          r = 1020;
+          g = 1020;
+          b = 1020;
         }
-        int randnoise = random() % 100;
-        r = r * ((S_RGB_RED(C->sensorstate[s]) > 200) ? 3 : 0) + (random() % 200) + 100;
-        g = g * ((S_RGB_GREEN(C->sensorstate[s]) > 200) ? 3 : 0) + (random() % 200) + 100;
-        b = b * ((S_RGB_BLUE(C->sensorstate[s]) > 200) ? 3 : 0) + (random() % 200) + 100;
+        r = r * ((S_RGB_RED(C->sensorstate[s]) > 200) ? 2 : 0) + (random() % 200) + 100;
+        g = g * ((S_RGB_GREEN(C->sensorstate[s]) > 200) ? 2 : 0) + (random() % 200) + 100;
+        b = b * ((S_RGB_BLUE(C->sensorstate[s]) > 200) ? 2 : 0) + (random() % 200) + 100;
+        //fprintf(stdout, "%02d / %02d: r=%04d, g=%04d, b=%04d (R=%d,G=%d,B=%d)\n", C->measure_row, i, r, g, b,(S_RGB_RED(C->sensorstate[s])>200)?2:0,0,0);
         C->sensors[s] = (((r>g)?r:g)>b)?((r>g)?r:g):b;
         if(0 == (C->sensorstate[s] & S_RGB_MASK)) {
           C->sensors[s] = C->sensors[s]/100+(random()%120);
@@ -436,9 +436,6 @@ void bb_free(bb_ctx* C) {
       SDL_DestroyMutex(C->mutex_wait_sensor);
       SDL_DestroyCond(C->cond_wait_sensor);
     }
-		if(C->window != NULL) {
-      SDL_DestroyWindow(C->window);
-		}
 		free(C);
 	}
 }
