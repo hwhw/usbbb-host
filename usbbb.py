@@ -43,7 +43,9 @@ int bb_wait_measure(bb_ctx* C);
 /* fill a 12x8 size array with the current sensor state */
 void bb_get_sensordata(bb_ctx *C, uint16_t sensordata[]);
 """)
-lib = ffi.dlopen("./libusbbb-emu.so") if ("BBEMU" in os.environ) else ffi.dlopen("./libusbbb.so")
+
+abs_path = os.path.dirname(os.path.realpath(__file__))
+lib = ffi.dlopen(abs_path + "/libusbbb-emu.so") if ("BBEMU" in os.environ) else ffi.dlopen(abs_path + "/libusbbb.so")
 
 class BB:
     """BlackBox hardware access library"""
