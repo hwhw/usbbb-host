@@ -306,7 +306,12 @@ static int bb_event_thread(void *d) {
 
       SDL_UnlockMutex(C->mutex_transmitting);
     } else {
-      if(event.type == SDL_MOUSEMOTION) {
+      if(event.type == SDL_QUIT) {
+        C->running = false;
+        SDL_Quit();
+        exit(0);
+      }
+      else if(event.type == SDL_MOUSEMOTION) {
         int mx = event.motion.x;
         int my = event.motion.y;
         int p = sensor_pos(mx, my);
