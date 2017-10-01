@@ -229,7 +229,7 @@ static void render(bb_ctx *C) {
         SDL_SetRenderDrawColor(C->renderer, 0, 0, 200, 255);
         break;
       case 3:
-        SDL_SetRenderDrawColor(C->renderer, 150, 0, 150, 255);
+        SDL_SetRenderDrawColor(C->renderer, 200, 200, 200, 255);
         break;
     }
     SDL_RenderFillRect(C->renderer, rect_chip(i, &r, 0));
@@ -291,11 +291,11 @@ static int bb_event_thread(void *d) {
           g = 1020;
           b = 1020;
         }
-        r = r * ((S_RGB_RED(C->sensorstate[s]) > 200) ? 2 : 0) + (random() % 200) + 100;
-        g = g * ((S_RGB_GREEN(C->sensorstate[s]) > 200) ? 2 : 0) + (random() % 200) + 100;
-        b = b * ((S_RGB_BLUE(C->sensorstate[s]) > 200) ? 2 : 0) + (random() % 200) + 100;
-        //fprintf(stdout, "%02d / %02d: r=%04d, g=%04d, b=%04d (R=%d,G=%d,B=%d)\n", C->measure_row, i, r, g, b,(S_RGB_RED(C->sensorstate[s])>200)?2:0,0,0);
-        C->sensors[s] = (((r>g)?r:g)>b)?((r>g)?r:g):b;
+        r = r * ((S_RGB_RED(C->sensorstate[s]) > 100) ? 2 : 0) + (random() % 200) + 100;
+        g = g * ((S_RGB_GREEN(C->sensorstate[s]) > 100) ? 2 : 0) + (random() % 200) + 100;
+        b = b * ((S_RGB_BLUE(C->sensorstate[s]) > 100) ? 2 : 0) + (random() % 200) + 100;
+        //fprintf(stdout, "%02d / %02d: r=%04d, g=%04d, b=%04d, %04d (R=%d,G=%d,B=%d)\n", C->measure_row, i, r, g, b, r+b+g,(S_RGB_RED(C->sensorstate[s])>100)?2:0,(S_RGB_GREEN(C->sensorstate[s])>100)?2:0, (S_RGB_BLUE(C->sensorstate[s])>100)?2:0);
+        C->sensors[s] = r + g + b;
         if(0 == (C->sensorstate[s] & S_RGB_MASK)) {
           C->sensors[s] = C->sensors[s]/100+(random()%120);
         }
@@ -326,13 +326,13 @@ static int bb_event_thread(void *d) {
         if(p != -1) {
           switch(event.button.button) {
             case SDL_BUTTON_LEFT:
-              C->sensorstate[p] |= (C->chipcolor[0] << 16) | (C->chipcolor[1] << 8) | C->chipcolor[2];
+              C->sensorstate[p] |= (p >= 64) ? S_RGB_MASK : (C->chipcolor[0] << 16) | (C->chipcolor[1] << 8) | C->chipcolor[2];
               break;
             case SDL_BUTTON_RIGHT:
               if(C->sensorstate[p] & S_RGB_MASK) {
                 C->sensorstate[p] &= ~(S_RGB_MASK);
               } else {
-                C->sensorstate[p] |= (C->chipcolor[0] << 16) | (C->chipcolor[1] << 8) | C->chipcolor[2];
+                C->sensorstate[p] |= (p >= 64) ? S_RGB_MASK : (C->chipcolor[0] << 16) | (C->chipcolor[1] << 8) | C->chipcolor[2];
               }
               break;
           }
@@ -358,9 +358,9 @@ static int bb_event_thread(void *d) {
               C->chipcolor[2] = 255;
               break;
             case 3:
-              C->chipcolor[0] = 200;
-              C->chipcolor[1] = 0;
-              C->chipcolor[2] = 200;
+              C->chipcolor[0] = 255;
+              C->chipcolor[1] = 255;
+              C->chipcolor[2] = 255;
               break;
           }
         }
