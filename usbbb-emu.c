@@ -84,29 +84,29 @@ static SDL_Rect* rect_led(int led, SDL_Rect* r) {
 }
 
 static SDL_Rect* rect_sensor(int sensor, SDL_Rect* r, int border) {
-  if(sensor < 64) {
+  if(sensor < 64) { // field
     r->w = 56+border*2;
     r->h = 56+border*2;
     int x=sensor/8;
     int y=7-(sensor % 8);
     r->x = 82 - border + x*60;
     r->y = 82 - border + y*60;
-  } else if(sensor < 72) {
+  } else if(sensor < 72) { // right
     r->w = 16+border*2;
     r->h = 56+border*2;
-    r->y = 82-border + (sensor-64)*60;
+    r->y = 82-border + (7-(sensor-64))*60;
     r->x = 621-border;
-  } else if(sensor < 80) {
+  } else if(sensor < 80) { // top
     r->w = 56+border*2;
     r->h = 16+border*2;
     r->x = 82-border + (sensor-72)*60;
     r->y = 2-border;
-  } else if(sensor < 88) {
+  } else if(sensor < 88) { // left
     r->w = 16+border*2;
     r->h = 56+border*2;
-    r->y = 82-border + (sensor-80)*60;
+    r->y = 82-border + (7-(sensor-80))*60;
     r->x = 2-border;
-  } else if(sensor < 96) {
+  } else if(sensor < 96) { // bottom
     r->w = 56+border*2;
     r->h = 16+border*2;
     r->x = 82-border + (sensor-88)*60;
@@ -119,10 +119,10 @@ static int sensor_pos(int x, int y) {
   int sensor = -1;
   if(x < 20 && y >= (20+60) && y < (20+540)) {
     // sensors left
-    sensor = 80 + (y-(20+60))/60;
+    sensor = 80 + 7 - (y-(20+60))/60;
   } else if(x >= 620 && y >= (20+60) && y < (20+540)) {
     // sensors right
-    sensor = 64 + (y-(20+60))/60;
+    sensor = 64 + 7 - (y-(20+60))/60;
   } else if(y < 20 && x >= (20+60) && x < (20+540)) {
     // sensors top
     sensor = 72 + (x-(20+60))/60;
